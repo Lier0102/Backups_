@@ -1,0 +1,95 @@
+32비트..
+
+컴파일
+main함수 확인
+Dump of assembler code for function main:
+   0x000011b4 <+0>:	lea    ecx,[esp+0x4]
+   0x000011b8 <+4>:	and    esp,0xfffffff0
+   0x000011bb <+7>:	push   DWORD PTR [ecx-0x4]
+   0x000011be <+10>:	push   ebp
+   0x000011bf <+11>:	mov    ebp,esp
+   0x000011c1 <+13>:	push   ecx
+   0x000011c2 <+14>:	sub    esp,0x4
+   0x000011c5 <+17>:	call   0x11e8 <__x86.get_pc_thunk.ax>
+   0x000011ca <+22>:	add    eax,0x2e2a
+   0x000011cf <+27>:	push   0x4
+   0x000011d1 <+29>:	push   0x3
+   0x000011d3 <+31>:	push   0x2
+   0x000011d5 <+33>:	push   0x1
+   0x000011d7 <+35>:	call   0x117d <vuln>
+   0x000011dc <+40>:	add    esp,0x10
+   0x000011df <+43>:	nop
+   0x000011e0 <+44>:	mov    ecx,DWORD PTR [ebp-0x4]
+   0x000011e3 <+47>:	leave
+   0x000011e4 <+48>:	lea    esp,[ecx-0x4]
+   0x000011e7 <+51>:	ret
+
+    Arch:       i386-32-little
+    RELRO:      Partial RELRO
+    Stack:      No canary found
+    NX:         NX enabled
+    PIE:        PIE enabled
+    Stripped:   No
+
+보호기법까지 확인
+
+vuln을 호출하는 지점에 중단점을 설정함.
+main에서의 esp가 vuln에서의 ebp로 전환되는 과정, 프레임끼리의 연결을 이어나감.
+그러므로 main이 vuln을 호출하는 과정 중엔 
+main의 esp+x에 vuln의 인자가 저장된다고 볼 수 있음.
+
+반면, vuln입장에선 ebp+x에 인자가 저장되는 것임.(ebp-x는 지역, ebp+x가 인자)
+그러므로 ebp는 esp로부터 0x14만큼 떨어지게 됨
+
+b+ 0x56556191 <vuln+20>    push   dword ptr [ebp + 0x14]
+ ► 0x56556194 <vuln+23>    push   dword ptr [ebp + 0x10]
+
+...
+
+pwndbg> x/4wx $esp
+0xffffcc30:	0x00000004	0xf7fc3000	0x00000000	0x56556189
+
+...
+
+pwndbg> x/wx $ebp+0x14
+0xffffcc5c:	0x00000004
+
+(중단점을 vuln+20에 설정한 뒤, 다음 흐름으로 넘어가 ebp+0x14, esp의 값을 각각 확인한 결과)
+이후 연산으로도 인자가 차례차례 저장된다.
+
+즉ㅡ
+
+---
+buf
+--- < ebp, esp
+sfp
+---
+ret
+
+의 구조가 이루어지는 것이다.
+... 좀 더 자세하게,
+
+ebp는 현재 함수의 고정점, esp는 최상단, 스택은 낮은 주소를 향해 자람을 기억하자..
+sfp에는 saved ebp, 이전 함수의 ebp가 담긴다.
+
+더 설명하고 싶지만 그건 알아서 이해하도록 해라.
+내 알 바 아니다.
+
+암튼 vuln()에 들어가면 esp가 ret addr을 가리키게 됨. vuln()끝나고 실행될 main어딘가.
+이유는 call vuln에서 call이
+push eip
+jump vuln을 하기 때문임.
+
+그래서 vuln들어갔을 때 i r esp, esp의 주소를 확인하고
+read()직전 인수 설정에서 buf가 ebp-0x3e인걸 확인.
+
+esp의 아까 전 주소(ret addr)와 read()직전의 .. 귀찮네
+
+b *main, b main의 차이점은
+명령어 실행 후/전의 차이이다.
+
+break (aesterisk)*의 경우 말 그대로 "main"에서 정지한다.
+break 의 경우 main의 기본 설정(프롤로그)이 끝난 뒤 정지한다.
+
+그러니까, 학습할 때는 esp, ebp제대로 보고 싶으면 b *main, 뭐 얘네 볼 필요없이 인자부터 본다 그러면 b main하면 되지 않을까;;
+뭐 그렇겠지;;
