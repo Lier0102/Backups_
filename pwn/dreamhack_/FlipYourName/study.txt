@@ -1,0 +1,9 @@
+보호기법 확인
+    Arch:       amd64-64-little
+    RELRO:      Full RELRO
+    Stack:      Canary found
+    NX:         NX enabled
+    PIE:        PIE enabled
+    SHSTK:      Enabled
+    IBT:        Enabled
+..딱봐도 로직과 관련된 버그 악용하는 것 같은데..
