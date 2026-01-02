@@ -1,0 +1,10 @@
+qemu-system-x86_64 \
+-m 4G -smp 4,cores=4,threads=1 \
+-kernel ./bzImage \
+-initrd  ./rootfs.cpio \
+-append "root=/dev/ram rw console=ttyS0 oops=panic panic=1 quiet nopti" \
+-netdev user,id=t0, -device e1000,netdev=t0,id=nic0 \
+-nographic  \
+-cpu host \
+-enable-kvm \
+-s \
