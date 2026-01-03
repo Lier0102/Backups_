@@ -47,5 +47,18 @@ context.terminal = ["tmux", "splitw", "-h"]
 # GOT overwrite는 불가, 바이너리에는 쓸만한 ROP gadget 없음.
 # mprotect ROP, one_gadget, 아니면 ROP 쓰는게 정배로 보임
 
+def create(t, n):
+  p.sendlineafter(b'> ', b'1')
+  p.sendlineafter(b'type: ', t)
+  p.sendlineafter(b'name: ', n)
+
+def walk():
+  p.sendlineafter(b'> ', b'2')
+
+def rename(n):
+  p.sendlineafter(b'> ', b'3')
+  p.sendlineafter(b'name: ', n)
+
+# 나중에 풀어야겠다
 
 p.interactive()
