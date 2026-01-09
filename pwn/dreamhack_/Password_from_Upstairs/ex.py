@@ -36,6 +36,7 @@ p.recvuntil(b'And now...Presto!\n')
 # slog("leak libc", lb)
 # lb = lb - 0x2a1ca
 # slog("libc_base", lb)
+# 풀려면 environ, rsp/rbp로 v2 위치 계산으로 풀 수 있을듯
 
 dump = p.recvall()
 
