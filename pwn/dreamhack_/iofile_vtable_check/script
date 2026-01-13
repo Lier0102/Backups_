@@ -1,0 +1,2 @@
+alias pwn16="docker run --rm -it -v /Users/$USER/Downloads/pwn:/root/pwn --name ubuntu_16 young34844/ctf_ubuntu_16.04 /bin/zsh"
+alias pwn18="docker run --rm -it -v /Users/$USER/Downloads/pwn:/root/pwn --name ubuntu_18 young34844/ctf_ubuntu_18.04 /bin/zsh"
