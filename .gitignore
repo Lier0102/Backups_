@@ -4,3 +4,4 @@ kernel/result
 git_token.txt
 .gdb_history
 pwn/dreamhack_/minary
+node_modules/
