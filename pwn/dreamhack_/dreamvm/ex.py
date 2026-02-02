@@ -1,10 +1,3 @@
-from pwn import *
-import struct
-
-context(arch="amd64", bits=64, endian="little")
-
-HOST, PORT = "host8.dreamhack.games 1234".split()
-
 '''
 메인 아이디어
 > read, write를 할 수 있다?
@@ -36,12 +29,6 @@ case 6:
     read_all()
 '''
 
-if args.REMOTE:
-    p = remote(HOST, PORT)
-else:
-    p = process('./dreamvm')
-
-
 # 내 머리로는 풀 수 없다...
 
 # gdb.attach(p)
@@ -63,22 +50,9 @@ else:
 ... 적절한 변명도 없지만 굳이 모아서 말하자면 그렇습니다..
 그냥 경험도 부족한데 너무 오만했던 것 같음
 1월도 얼마 남지 않았으니 지금이라도 귀찮았던 걸 해야할듯
+이래놓고 2월이 되어서야 시작함
 '''
 
-CodeSize = 0x100
+from pwn import *
 
-##
-PUSH = b'\x01'
-POP = b'\x02'
-
-ADD_AC = b'\x03'
-ADD_SP = b'\x04'
-
-OUT = b'\x05'
-IN = b'\x06'
-
-if __name__ == '__main__':
-    e = ELF('./dreamvm')
-    
-
-p.interactive()
+context.binary = 
