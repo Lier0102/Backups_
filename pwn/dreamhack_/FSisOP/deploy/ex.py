@@ -17,16 +17,28 @@ context.terminal = ["tmux", "splitw", "-h"]
 
 HOST, PORT = "ASDF 1234".split()
 
+def slog(n, a): return info(": ".join([n, hex(a)]))
+
+s       = lambda data               :p.send(data)
+sa      = lambda delim, data        :p.sendafter(delim, data)
+sl      = lambda data               :p.sendline(data)
+sla     = lambda delim, data        :p.sendlineafter(delim, data)
+r       = lambda num=4096           :p.recv(num)
+rl      = lambda                    :p.recvline()
+ru      = lambda delim, drop=True   :p.recvuntil(delim, drop)
+l64     = lambda                    :u64(p.recvuntil(b'\x7f')[-6:].ljust(8, b'\x00'))
+uu64    = lambda data               :u64(data.ljust(8, b'\x00'))
+
 if args.REMOTE:
     p = remote(HOST, PORT)
     libc = ELF('./libc.so.6') # or other exact path
 else:
-    p = process() # or env can be added
-    libc = e.libc
+    p = process(env={"LD_PRELOAD":"./libc.so.6"}) # or env can be added
+    libc = ELF('./libc.so.6')
 
-def somefunc():
-    pass
+lb = int(rl().strip(), 16) - libc.sym["_IO_2_1_stdout_"]
+slog("libc_base",  lb)
 
-# some actions..
+
 
 p.interactive()
