@@ -44,3 +44,8 @@ _IO_NO_READS = 0x4
 _wide_data offset = 0xa0
 _wide_vtable offset = 0xe0
 __doallocate offset = 0x68
+
+>> 가장 맞추기 쉬운 조건 <<(io_overflow)
+fp->_mode <= 0 << wide_data 모드가 아님을 지정
+fp->_IO_write_ptr > fp->_IO_write_base << 데이터가 버퍼 남아 있음, 따라서 overflow.
+fp->vtable = &_IO_wfile_jumps
