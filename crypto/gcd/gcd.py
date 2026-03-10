@@ -7,7 +7,7 @@ def gcd(a, b):
     return gcd(b, a % b)
 
 a, b = map(int, input().split())
-print("gcd(a, b):", sep=' ')
+print("gcd(a, b):", end=' ')
 
 tmp = 0
 if a > b:
