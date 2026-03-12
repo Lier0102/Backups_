@@ -1,0 +1,5 @@
+curl -X POST http://host3.dreamhack.games:11944/auth -H 'Content-Type: application/json' -d '{"uid": "_all_docs", "upw": "guest"}'
+
+// 일단 /auth가 uid를 그대로 가져다 쓴다는 점을 이용해 uid에 _all_docs를 넣어 특수 구성 요소를 이용
+// req.body.upw가 null, res.upw가 null이면 자바스크립트의 '===' 연산자로 비교 시 true를 반환할 거라는 아이디어가 떠오름
+// 하지만 위 페이로드를 실행했을 때 fail이 떴으므로 아이디어가 틀렸다는 것을 알 수 있음 .. ㄲㅂ;
