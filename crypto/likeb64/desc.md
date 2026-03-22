@@ -1,0 +1,10 @@
+문제 설명
+Description
+드림이가 base64를 공부하고 자신만의 암호를 만들었어요.
+다음 주어진 암호문에서 플래그를 구해보세요!
+
+IREHWYJZMEcGCODGMMbTENDDGcbGEMJZGEbGEZTFGYaGKNRTMIcGIMBSGRQTSNDDGAaWGYZRHEbGCNRQMUaDOMbEMRTGEYJYGUaWGOJQMYZHa===
+
+플래그 형식은 DH{...} 입니다.
+
+hint: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef
