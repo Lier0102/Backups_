@@ -2,7 +2,7 @@
 from pwn import *
 
 context.arch = "amd64"
-context.binary = elf = ELF("./prob")
+context.binary = elf = ELF("./meep")
 context.log_level = "debug"
 context.terminal = ["tmux", "splitw", "-h"]
 
@@ -26,11 +26,8 @@ uu64 = lambda data: u64(data.ljust(8, b"\x00"))
 if args.REMOTE:
     p = remote(HOST, PORT)
     libc = ELF("./lib-mips/libc.so.6")  # or other exact path
-elif args.DOCKER:
-    p = remote("localhost", 9001)
 else:
-    p = process(env={"LD_PRELOAD": "./lib-mips/libc.so.6"})  # or env can be added
-    libc = ELF("./lib-mips/libc.so.6")
+    p = remote("localhost", 9001)
 
 
 p.interactive()
